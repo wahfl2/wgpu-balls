@@ -1,8 +1,15 @@
 [package]
-name = "dsfdsf"
+name = "wgpu_balls"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+wgpu = "0.13.1"
+winit = "0.27.3"
+env_logger = "0.9.1"
+log = "0.4.17"
+pollster = "0.2.5"
+cgmath = "0.18.0"
+bytemuck = { version = "1.12.1", features = [ "derive" ] }
