@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use state::State;
 use winit::{
     event::*,
@@ -12,6 +10,7 @@ pub mod state;
 pub mod instance;
 pub mod render_state;
 pub mod input_handler;
+pub mod util;
 
 pub fn main() {
     pollster::block_on(run());
