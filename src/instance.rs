@@ -3,6 +3,7 @@ use cgmath::{prelude::*, Vector3, Quaternion, Matrix4};
 pub struct Instance {
     position: Vector3<f32>,
     rotation: Quaternion<f32>,
+    scale: f32,
 }
 
 #[repr(C)]
@@ -14,7 +15,11 @@ pub struct InstanceRaw {
 impl Instance {
     pub fn to_raw(&self) -> InstanceRaw {
         InstanceRaw {
-            model: (Matrix4::from_translation(self.position) * Matrix4::from(self.rotation)).into(),
+            model: (
+                Matrix4::from_translation(self.position) * 
+                Matrix4::from(self.rotation) * 
+                Matrix4::from_scale(self.scale)
+            ).into(),
         }
     }
 }
