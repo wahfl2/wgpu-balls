@@ -37,8 +37,8 @@ fn vs_main(
 
     var out: VertexOutput;
     out.color = model.color * model.color;
-    out.clip_position = ((model_matrix * vec4<f32>(model.position, 0.0, 1.0)) / vec4<f32>(vp_size.viewport_size, 1.0, 1.0))
-         * vec4<f32>(1.0, 1.0, 0.0, 1.0) + vec4<f32>(-1.0, -1.0, 1.0, 0.0);
+    out.clip_position = ((model_matrix * vec4<f32>(model.position, 0.0, 1.0)) / vec4<f32>((vp_size.viewport_size / 2.0), 1.0, 1.0))
+         * vec4<f32>(1.0, -1.0, 0.0, 1.0) + vec4<f32>(-1.0, 1.0, 1.0, 0.0);
     return out;
 }
 
