@@ -11,6 +11,7 @@ pub mod instance;
 pub mod render_state;
 pub mod input_handler;
 pub mod util;
+pub mod uniform;
 
 pub fn main() {
     pollster::block_on(run());
@@ -44,12 +45,12 @@ pub async fn run() {
                 ..
             } => *control_flow = ControlFlow::Exit,
 
-            WindowEvent::KeyboardInput { device_id, input, is_synthetic } => {
+            WindowEvent::KeyboardInput { device_id: _, input, is_synthetic: _ } => {
                 input_handler.handle_kb_input(input);
             },
 
-            WindowEvent::CursorMoved { device_id, position, modifiers } => {
-
+            WindowEvent::CursorMoved { device_id: _, position, modifiers: _ } => {
+                input_handler.handle_cursor_movement(position);
             }
 
             WindowEvent::Resized(physical_size) => {
@@ -66,7 +67,7 @@ pub async fn run() {
             event
         } => match event {
             DeviceEvent::Button { button, state } => {
-                input_handler.handle_mouse_button(button, state);
+                input_handler.handle_mouse_button(button, state, &mut render_state);
             }
             _ => {}
         }
