@@ -4,7 +4,7 @@ use winit::{
     window::Window,
 };
 
-use crate::{vertex::Vertex, instance::{Instance, InstanceRaw}, util::RenderCircle};
+use crate::{vertex::Vertex, instance::{Instance, InstanceRaw}, util::RenderCircle, uniform::VpSizeUniform};
 
 pub struct RenderState {
     surface: wgpu::Surface,
@@ -16,6 +16,9 @@ pub struct RenderState {
     index_buffer: wgpu::Buffer, 
     instances: Vec<Instance>,
     instance_buffer: wgpu::Buffer,
+    viewport_size_uniform: VpSizeUniform,
+    uniform_buffer: wgpu::Buffer,
+    uniform_bind_group: wgpu::BindGroup,
     pub(crate) size: winit::dpi::PhysicalSize<u32>,
     pub(crate) num_indices: u32,
 }
@@ -53,11 +56,50 @@ impl RenderState {
         };
         surface.configure(&device, &config);
 
+        let uniform = VpSizeUniform::new(size);
+
+        let uniform_buffer = device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Uniform Buffer"),
+                contents: bytemuck::cast_slice(&[uniform]),
+                usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            }
+        );
+
+        let uniform_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::VERTEX,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                    count: None,
+                }
+            ],
+            label: Some("uniform_bind_group_layout"),
+        });
+
+        let uniform_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &uniform_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: uniform_buffer.as_entire_binding(),
+                }
+            ],
+            label: Some("uniform_bind_group"),
+        });
+
         let shader = device.create_shader_module(include_wgsl!("shader.wgsl"));
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[],
+                bind_group_layouts: &[
+                    &uniform_bind_group_layout,
+                ],
                 push_constant_ranges: &[],
             });
 
@@ -67,10 +109,7 @@ impl RenderState {
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: "vs_main",
-                buffers: &[
-                    Vertex::desc(),
-                    InstanceRaw::desc(),
-                ],
+                buffers: &[Vertex::desc(), InstanceRaw::desc()],
             },
             fragment: Some(wgpu::FragmentState { 
                 module: &shader,
@@ -85,7 +124,7 @@ impl RenderState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
                 strip_index_format: None,
                 front_face: wgpu::FrontFace::Ccw, 
-                cull_mode: Some(wgpu::Face::Back),
+                cull_mode: None,
                 polygon_mode: wgpu::PolygonMode::Fill,
                 unclipped_depth: false,
                 conservative: false,
@@ -96,7 +135,7 @@ impl RenderState {
         });
 
         let mut ball = RenderCircle::new(32, [1.0, 0.0, 0.0]);
-        
+
         let vertices_vec = ball.get_vertices();
         let vertices = vertices_vec.as_slice();
 
@@ -140,6 +179,9 @@ impl RenderState {
             index_buffer,
             instance_buffer,
             instances,
+            viewport_size_uniform: uniform,
+            uniform_buffer,
+            uniform_bind_group,
             size,
             num_indices,
         }
@@ -150,12 +192,18 @@ impl RenderState {
             self.size = new_size;
             self.config.width = new_size.width;
             self.config.height = new_size.height;
+            self.viewport_size_uniform.viewport_size = new_size.into();
             self.surface.configure(&self.device, &self.config);
         }
     }
 
     pub fn input(&mut self, event: &WindowEvent) -> bool {
         false
+    }
+
+    pub fn add_instance(&mut self, instance: Instance) {
+        self.instances.push(instance);
+        self.recreate_instance_buffer();
     }
 
     fn recreate_instance_buffer(&mut self) {
@@ -196,11 +244,12 @@ impl RenderState {
 
             render_pass.set_pipeline(&self.render_pipeline); 
 
+            render_pass.set_bind_group(0, &self.uniform_bind_group, &[]);
             render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
             render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
             render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint32);
 
-            render_pass.draw_indexed(0..self.num_indices, 0, 0..self.instances.len() as _); 
+            render_pass.draw_indexed(0..self.num_indices, 0, 0..self.instances.len() as u32); 
         }
     
         self.queue.submit(std::iter::once(encoder.finish()));
