@@ -23,7 +23,7 @@ impl RenderCircle {
                 let angle_divisor = self.num_vertices as f32;
         
                 for i in 0..self.num_vertices {
-                    let angle = (i as f32 / angle_divisor) * PI;
+                    let angle = (i as f32 / angle_divisor) * PI * 2.0;
                     vertices.push(Vertex {
                         position: [angle.cos(), angle.sin()],
                         color: self.color,
