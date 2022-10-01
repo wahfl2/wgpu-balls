@@ -2,6 +2,8 @@ use itertools::Itertools;
 
 use crate::util::Vec2;
 
+pub const CENTER_OF_SCREEN: Vec2 = Vec2::new(960.0, 505.5);
+
 pub struct Physics {
     pub(crate) balls: Vec<Ball>,
 }
@@ -21,15 +23,23 @@ impl Physics {
         }
     }
 
+    pub fn add_ball(&mut self, ball: Ball) {
+        self.balls.push(ball);
+    }
+
     // ewwww
     fn collide(&mut self, i: usize, j: usize) {
+        let ball_1 = self.balls[i].clone();
+        let ball_2 = self.balls[j].clone();
+
         let b = &mut self.balls;
-        let added_radii = b[i].radius + b[j].radius;
-        if (b[i].pos.x - b[j].pos.x).abs() < added_radii && (b[i].pos.y - b[j].pos.y).abs() < added_radii {
-            let distance = b[i].pos.distance(&b[j].pos);
+
+        let added_radii = ball_1.radius + ball_2.radius;
+        if (ball_1.pos.x - ball_2.pos.x).abs() < added_radii && (ball_1.pos.y - ball_2.pos.y).abs() < added_radii {
+            let distance = ball_1.pos.distance(&ball_2.pos);
             if distance < added_radii {
                 let move_dist = added_radii - distance;
-                let resolution_vec = (b[i].pos - b[j].pos).normalize() * Vec2::fill(move_dist * 0.5);
+                let resolution_vec = (ball_1.pos - ball_2.pos).normalize() * Vec2::fill(move_dist * 0.5);
 
                 b[i].pos += resolution_vec;
                 b[i].vel += resolution_vec;
@@ -59,19 +69,19 @@ impl Ball {
 
     pub fn update_pos(&mut self) {
         self.pos += self.vel;
-        self.vel.y -= 0.1;
+        self.vel.y += 0.2;
         self.vel *= Vec2::fill(0.9995);
 
         self.circle_boundary();
     }
 
     fn circle_boundary(&mut self) {
-        let distance = self.pos.length();
-        let allowed_distance = 900.0 - self.radius;
+        let distance = self.pos.distance(&CENTER_OF_SCREEN);
+        let allowed_distance = 500.0 - self.radius;
 
         if distance > allowed_distance {
             let move_dist = distance - allowed_distance;
-            let resolution_vec = self.pos.normalize() * move_dist;
+            let resolution_vec = (self.pos - CENTER_OF_SCREEN).normalize() * move_dist;
 
             self.pos -= resolution_vec;
             self.vel -= resolution_vec;

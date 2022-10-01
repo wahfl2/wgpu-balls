@@ -1,5 +1,7 @@
 use std::{f32::consts::PI, ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign}};
 
+use cgmath::Vector2;
+
 use crate::vertex::Vertex;
 
 pub struct RenderCircle {
@@ -62,7 +64,7 @@ pub struct Vec2 {
 }
 
 impl Vec2 {
-    pub fn new(x: f32, y: f32) -> Self {
+    pub const fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
 
@@ -83,6 +85,12 @@ impl Vec2 {
 
     pub fn normalize(self) -> Self {
         return self / Vec2::fill(self.length())
+    }
+}
+
+impl Into<Vector2<f32>> for Vec2 {
+    fn into(self) -> Vector2<f32> {
+        Vector2 { x: self.x, y: self.y }
     }
 }
 

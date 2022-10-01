@@ -66,7 +66,7 @@ pub async fn run() {
             event
         } => match event {
             DeviceEvent::Button { button, state } => {
-                app_state.input_handler.handle_mouse_button(button, state, &mut app_state.render_state);
+                app_state.input_handler.handle_mouse_button(button, state);
             }
             _ => {}
         }

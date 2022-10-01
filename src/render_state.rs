@@ -14,7 +14,7 @@ pub struct RenderState {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer, 
-    instances: Vec<Instance>,
+    pub(crate) instances: Vec<Instance>,
     instance_buffer: wgpu::Buffer,
     viewport_size_uniform: VpSizeUniform,
     uniform_buffer: wgpu::Buffer,
@@ -206,7 +206,7 @@ impl RenderState {
         self.recreate_instance_buffer();
     }
 
-    fn recreate_instance_buffer(&mut self) {
+    pub fn recreate_instance_buffer(&mut self) {
         let instance_data = self.instances.iter().map(Instance::to_raw).collect::<Vec<_>>();
 
         self.instance_buffer = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -231,9 +231,9 @@ impl RenderState {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
+                            r: 0.0,
+                            g: 0.0,
+                            b: 0.0,
                             a: 1.0,
                         }),
                         store: true,
