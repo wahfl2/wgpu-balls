@@ -1,6 +1,7 @@
 use std::{f32::consts::PI, ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign}};
 
 use cgmath::Vector2;
+use rand::Rng;
 
 use crate::vertex::Vertex;
 
@@ -167,5 +168,37 @@ impl Div for Vec2 {
 impl DivAssign for Vec2 {
     fn div_assign(&mut self, rhs: Self) {
         *self = *self / rhs;
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Color {
+    r: f32,
+    g: f32,
+    b: f32,
+}
+
+impl Color {
+    pub const RED: Self = Color::new(1.0, 0.0, 0.0);
+    pub const GREEN: Self = Color::new(0.0, 1.0, 0.0);
+    pub const BLUE: Self = Color::new(0.0, 0.0, 1.0);
+
+    pub const fn new(r: f32, g: f32, b: f32) -> Self {
+        Self { r, g, b }
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        Color::new(rng.gen(), rng.gen(), rng.gen())
+    }
+
+    pub fn into_arr(self) -> [f32; 3] {
+        [self.r, self.g, self.b]
+    }
+}
+
+impl Into<[f32; 3]> for Color {
+    fn into(self) -> [f32; 3] {
+        [self.r, self.g, self.b]
     }
 }

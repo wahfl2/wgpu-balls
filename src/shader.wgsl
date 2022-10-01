@@ -10,6 +10,8 @@ struct InstanceInput {
     @location(6) model_matrix_1: vec4<f32>,
     @location(7) model_matrix_2: vec4<f32>,
     @location(8) model_matrix_3: vec4<f32>,
+
+    @location(9) color: vec3<f32>,
 };
 
 struct VpSizeUniform {
@@ -36,7 +38,7 @@ fn vs_main(
     );
 
     var out: VertexOutput;
-    out.color = model.color * model.color;
+    out.color = instance.color * instance.color;
     out.clip_position = ((model_matrix * vec4<f32>(model.position, 0.0, 1.0)) / vec4<f32>((vp_size.viewport_size / 2.0), 1.0, 1.0))
          * vec4<f32>(1.0, -1.0, 0.0, 1.0) + vec4<f32>(-1.0, 1.0, 1.0, 0.0);
     return out;
@@ -46,6 +48,5 @@ fn vs_main(
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    return vec4<f32>(1.0, 0.0, 0.0, 1.0);
-    // return vec4<f32>(in.color, 1.0);
+    return vec4<f32>(in.color, 1.0);
 }

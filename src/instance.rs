@@ -1,15 +1,19 @@
 use cgmath::{Quaternion, Matrix4, Vector2};
 
+use crate::util::Color;
+
 pub struct Instance {
     pub(crate) position: Vector2<f32>,
     pub(crate) rotation: Quaternion<f32>,
     pub(crate) scale: f32,
+    pub(crate) color: Color,
 }
 
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct InstanceRaw {
     model: [[f32; 4]; 4],
+    color: [f32; 3],
 }
 
 impl Instance {
@@ -22,6 +26,7 @@ impl Instance {
 
         InstanceRaw {
             model: transformation_matrix.into(),
+            color: self.color.into(),
         }
     }
 }
@@ -61,6 +66,11 @@ impl InstanceRaw {
                     shader_location: 8,
                     format: wgpu::VertexFormat::Float32x4,
                 },
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 16]>() as wgpu::BufferAddress,
+                    shader_location: 9,
+                    format: wgpu::VertexFormat::Float32x3,
+                }
             ],
         }
     }

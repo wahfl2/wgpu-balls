@@ -3,7 +3,7 @@ use std::time::Instant;
 use cgmath::{Vector2, Quaternion, Vector3};
 use winit::{window::Window, event_loop::ControlFlow};
 
-use crate::{render_state::RenderState, input_handler::InputHandler, physics::{Physics, Ball}, instance::Instance};
+use crate::{render_state::RenderState, input_handler::InputHandler, physics::{Physics, Ball}, instance::Instance, util::Color};
 
 pub struct State {
     pub(crate) render_state: RenderState,
@@ -37,7 +37,7 @@ impl State {
                 avg += time;
             }
             avg /= len as f32;
-            println!("Average update time: {}ms", avg * 1000f32);
+            println!("Average update time: {}ms", (avg * 1000000f32).round() / 1000f32);
 
             self.update_times.clear();
         }
@@ -58,12 +58,13 @@ impl State {
         self.input_handler.balls_to_add.clear();
 
         for pos in balls_to_add.iter() {
-            self.physics.add_ball(Ball::new(pos.x, pos.y, 15.0));
+            self.physics.add_ball(Ball::new(pos.x, pos.y, 10.0));
 
             let instance = Instance {
                 position: Vector2::new(pos.x, pos.y),
                 rotation: Quaternion::from_sv(1.0, Vector3::unit_y()),
-                scale: 15.0,
+                scale: 10.0,
+                color: Color::random(),
             };
 
             self.render_state.add_instance(instance);
