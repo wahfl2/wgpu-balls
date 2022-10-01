@@ -1,6 +1,6 @@
 use crate::util::Vec2;
 
-pub const CENTER_OF_SCREEN: Vec2 = Vec2::new(960.0, 505.5);
+pub const CENTER_OF_SCREEN: Vec2 = Vec2::new(960.0, 515.0);
 const NUM_ITERATIONS: u32 = 4;
 
 pub struct Physics {
