@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use cgmath::{Vector2, Quaternion, Vector3};
 use winit::{window::Window, event_loop::ControlFlow};
 
@@ -7,6 +9,7 @@ pub struct State {
     pub(crate) render_state: RenderState,
     pub(crate) input_handler: InputHandler,
     pub(crate) physics: Physics,
+    update_times: Vec<f32>,
 }
 
 impl State {
@@ -15,14 +18,29 @@ impl State {
             render_state: RenderState::new(window).await,
             input_handler: InputHandler::new(),
             physics: Physics::new(),
+            update_times: Vec::new(),
         }
     }
 
     pub fn update(&mut self, control_flow: &mut ControlFlow) {
+        let start = Instant::now();
         self.input_handler.handle_input();
         self.add_input_balls();
         self.physics.update();
         self.sync_balls();
+
+        self.update_times.push((Instant::now() - start).as_secs_f32());
+        let len = self.update_times.len();
+        if len >= 30 {
+            let mut avg = 0f32;
+            for time in self.update_times.iter() {
+                avg += time;
+            }
+            avg /= len as f32;
+            println!("Average update time: {}ms", avg * 1000f32);
+
+            self.update_times.clear();
+        }
 
         match self.render_state.render() {
             Ok(_) => {}
@@ -40,12 +58,12 @@ impl State {
         self.input_handler.balls_to_add.clear();
 
         for pos in balls_to_add.iter() {
-            self.physics.add_ball(Ball::new(pos.x, pos.y, 10.0));
+            self.physics.add_ball(Ball::new(pos.x, pos.y, 15.0));
 
             let instance = Instance {
                 position: Vector2::new(pos.x, pos.y),
                 rotation: Quaternion::from_sv(1.0, Vector3::unit_y()),
-                scale: 10.0,
+                scale: 15.0,
             };
 
             self.render_state.add_instance(instance);
