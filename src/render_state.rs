@@ -1,4 +1,4 @@
-use wgpu::{include_wgsl, util::DeviceExt, BufferDescriptor};
+use wgpu::{include_wgsl, util::DeviceExt};
 use winit::{
     event::*,
     window::Window,
