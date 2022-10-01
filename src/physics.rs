@@ -1,8 +1,7 @@
-use itertools::Itertools;
-
 use crate::util::Vec2;
 
 pub const CENTER_OF_SCREEN: Vec2 = Vec2::new(960.0, 505.5);
+const NUM_ITERATIONS: u32 = 4;
 
 pub struct Physics {
     pub(crate) balls: Vec<Ball>,
@@ -18,8 +17,15 @@ impl Physics {
             ball.update_pos();
         }
 
-        for p in (0..self.balls.len()).permutations(2) {
-            self.collide(p[0], p[1]);
+        let balls_len = self.balls.len();
+
+        for _ in 0..NUM_ITERATIONS {
+            for i in 0..balls_len {
+                for j in 0..balls_len {
+                    if i == j { continue }
+                    self.collide(i, j);
+                }
+            }
         }
     }
 
@@ -35,19 +41,20 @@ impl Physics {
         let b = &mut self.balls;
 
         let added_radii = ball_1.radius + ball_2.radius;
-        if (ball_1.pos.x - ball_2.pos.x).abs() < added_radii && (ball_1.pos.y - ball_2.pos.y).abs() < added_radii {
-            let distance = ball_1.pos.distance(&ball_2.pos);
-            if distance < added_radii {
-                let move_dist = added_radii - distance;
-                let resolution_vec = (ball_1.pos - ball_2.pos).normalize() * Vec2::fill(move_dist * 0.5);
+        if (ball_1.pos.x - ball_2.pos.x).abs() >= added_radii { return }
+        if (ball_1.pos.y - ball_2.pos.y).abs() >= added_radii { return }
 
-                b[i].pos += resolution_vec;
-                b[i].vel += resolution_vec;
+        let distance = ball_1.pos.distance(&ball_2.pos);
+        if distance >= added_radii { return }
 
-                b[j].pos -= resolution_vec;
-                b[j].vel -= resolution_vec;
-            }
-        }
+        let move_dist = added_radii - distance;
+        let resolution_vec = (ball_1.pos - ball_2.pos).normalize() * Vec2::fill(move_dist * 0.5);
+
+        b[i].pos += resolution_vec;
+        b[i].vel += resolution_vec;
+
+        b[j].pos -= resolution_vec;
+        b[j].vel -= resolution_vec;
     }
 }
 
