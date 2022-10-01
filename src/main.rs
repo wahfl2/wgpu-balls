@@ -62,7 +62,7 @@ pub async fn run() {
         },
 
         Event::DeviceEvent { 
-            device_id, 
+            device_id: _, 
             event
         } => match event {
             DeviceEvent::Button { button, state } => {

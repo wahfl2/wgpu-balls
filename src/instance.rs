@@ -1,4 +1,4 @@
-use cgmath::{prelude::*, Quaternion, Matrix4, Vector2};
+use cgmath::{Quaternion, Matrix4, Vector2};
 
 pub struct Instance {
     pub(crate) position: Vector2<f32>,

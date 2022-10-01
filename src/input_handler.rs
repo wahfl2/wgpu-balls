@@ -1,7 +1,7 @@
-use cgmath::{Vector2, Quaternion, AbsDiffEq, Vector3};
+
 use winit::{event::{KeyboardInput, ElementState}, dpi::PhysicalPosition};
 
-use crate::{render_state::RenderState, instance::Instance, state::State, util::Vec2};
+use crate::{util::Vec2};
 
 pub struct InputHandler {
     mouse_pos: Option<PhysicalPosition<f64>>,
@@ -25,7 +25,7 @@ impl InputHandler {
         }
     }
 
-    pub fn handle_kb_input(&self, input: &KeyboardInput) {
+    pub fn handle_kb_input(&self, _input: &KeyboardInput) {
 
     }
 

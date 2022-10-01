@@ -3,7 +3,7 @@ use std::time::Instant;
 use cgmath::{Vector2, Quaternion, Vector3};
 use winit::{window::Window, event_loop::ControlFlow};
 
-use crate::{render_state::RenderState, input_handler::InputHandler, physics::{Physics, Ball}, util::Vec2, instance::Instance};
+use crate::{render_state::RenderState, input_handler::InputHandler, physics::{Physics, Ball}, instance::Instance};
 
 pub struct State {
     pub(crate) render_state: RenderState,
