@@ -13,6 +13,7 @@ pub mod input_handler;
 pub mod util;
 pub mod uniform;
 pub mod physics;
+pub mod quadtree;
 
 pub fn main() {
     pollster::block_on(run());

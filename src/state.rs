@@ -17,7 +17,7 @@ impl State {
         Self {
             render_state: RenderState::new(window).await,
             input_handler: InputHandler::new(),
-            physics: Physics::new(),
+            physics: Physics::default(),
             update_times: Vec::new(),
         }
     }

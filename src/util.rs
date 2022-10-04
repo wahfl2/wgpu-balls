@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign}};
+use std::{f32::consts::PI, ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign, Neg}};
 
 use cgmath::Vector2;
 use rand::Rng;
@@ -58,7 +58,7 @@ impl RenderCircle {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
@@ -69,7 +69,7 @@ impl Vec2 {
         Self { x, y }
     }
 
-    pub fn fill(n: f32) -> Self {
+    pub const fn fill(n: f32) -> Self {
         Self { x: n, y: n }
     }
 
@@ -86,6 +86,14 @@ impl Vec2 {
 
     pub fn normalize(self) -> Self {
         return self / Vec2::fill(self.length())
+    }
+
+    pub fn both_greater_eq(&self, other: &Vec2) -> bool {
+        self.x >= other.x && self.y >= other.y
+    }
+
+    pub fn both_less_eq(&self, other: &Vec2) -> bool {
+        self.x <= other.x && self.y <= other.y
     }
 }
 
@@ -165,9 +173,25 @@ impl Div for Vec2 {
     }
 }
 
+impl Div<f32> for Vec2 {
+    type Output = Self;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        self / Vec2::fill(rhs)
+    }
+}
+
 impl DivAssign for Vec2 {
     fn div_assign(&mut self, rhs: Self) {
         *self = *self / rhs;
+    }
+}
+
+impl Neg for Vec2 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Vec2::new(-self.x, -self.y)
     }
 }
 
